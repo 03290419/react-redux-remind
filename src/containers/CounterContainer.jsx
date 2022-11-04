@@ -1,3 +1,4 @@
+import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Counter from '../components/Counter';
 import { increase, decrease } from '../modules/counter';
@@ -12,14 +13,14 @@ export default connect(
   (state) => ({
     number: state.counter.number,
   }),
-  (dispatch) => ({
-    increase: () => {
-      dispatch(increase());
-    },
-    decrease: () => {
-      dispatch(decrease());
-    },
-  }),
+  (dispatch) =>
+    bindActionCreators(
+      {
+        increase,
+        decrease,
+      },
+      dispatch,
+    ),
 )(CounterContainer);
 // presentationer container 를 감싸서 export
 // mapStateToProps 리덕스 스토어 안의 상태를 컴포넌트의 props로 넘겨주기 위해 설정하는 함수
