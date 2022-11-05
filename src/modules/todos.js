@@ -31,9 +31,13 @@ const initialState = {
 const todo = handleActions(
   {
     [CHANGE_INPUT]: (state, { payload: input }) =>
-      produce(state, (draft) => (draft.input = input)),
+      produce(state, (draft) => {
+        draft.input = input;
+      }),
     [INSERT]: (state, { payload: todo }) =>
-      produce(state, (draft) => draft.todos.push(todo)),
+      produce(state, (draft) => {
+        draft.todos.push(todo);
+      }),
     [TOGGLE]: (state, { payload: id }) =>
       produce(state, (draft) => {
         const todo = draft.todos.find((todo) => todo.id === id);

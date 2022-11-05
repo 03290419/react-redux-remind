@@ -183,6 +183,8 @@ store.dispatch({ type: 'SAMPLE_ACTION' });
 store.getState();
 ```
 
+useStore은 정말 어쩌다 스토어에 직접 접근해야 하는 상황에만 사용한다.
+
 # Redux-actions
 
 redux actions를 사용하면 액션 생성 함수를 더 짧은 코드로 작성할 수 있다. 리듀서를 작성할 때도 switch/case 문이 아닌 handleActions라는 함수를 사용하여 각 액션마다 업데이트 함수를 설정하는 형식으로 작성해 줄 수 있다.
