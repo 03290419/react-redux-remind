@@ -1,70 +1,93 @@
-# Getting Started with Create React App
+# Redux 개념 정리
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Action
 
-## Available Scripts
+상태에 어떠한 변화가 필요하면 액션이라는 것이 발생한다. 액션 객체는 반드시 type 필드를 가지고 있어야 한다. 해당 값이 액션의 이름과 같다.
+그 외의 값은 상태 업데이트시 참고해야할 값이다.
 
-In the project directory, you can run:
+```js
+{
+    type:'APP_TODO',
+    data: {
+        id: 1,
+        text: '리덕스 배우기'
+    }
+}
+```
 
-### `yarn start`
+## Action Creator
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+액션 생성 함수는 액션 객체를 만들어 주는 함수이다.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```js
+function addTodo(data) {
+  return {
+    type: 'APP_TODO',
+    data,
+  };
+}
+```
 
-### `yarn test`
+## Reducer
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+리듀서는 **변화를 일으키는 함수**이다.
+액션을 만들어서 발생시키면 리듀서가 *현재 상태*와 *전달받은 액션 객체*를 파라미터로 받아온다. 그리고 두 값을 참조하여 새로운 상태를 만들어서 반환한다.
 
-### `yarn build`
+```js
+const initialState = {
+  counter: 1,
+};
+function reducer(state = initialState, action) {
+  switch (action.type) {
+    case INCREMENT:
+      return {
+        counter: state.counter + 1,
+      };
+    case DECREMENT:
+      return {
+        counter: state.counter - 1,
+      };
+    default:
+      return state;
+  }
+}
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Store
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+프로젝트에 리덕스를 적용하기 위해 스토어(store)를 만든다. 한 개의 프로젝트는 단 하나의 스토어만 가질 수 있다.
+스토어 안에는 현재 애플리케이션 상태와 리듀서가 들어있으며, 그 외에도 몇 가지 중요한 내장 함수를 지닌다.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Dispatch
 
-### `yarn eject`
+디스패치는 스토어의 내장 함수 중 하나이다. 디스패치는 **액션을 발생 시키는 것** 이다. 이 함수는 dispatch(action)과 같은 형태로 액션 객체를 파라미터로 넣어서 호출한다.
+이 함수가 _호출되면_ 스토어는 *리듀서 함수를 실행*시켜서 새로운 상태를 만들어준다.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+실행 흐름
+`dispatch` -> `reducer` -> new state
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## subscribe
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+구독도 스토어의 내장 함수 중 하나이다. subscribe 함수 안에 리스너 함수를 파라미터로 넣어서 호출해 주면 이 리스너 함수가 **액션이 디스패치되어 상태가 업데이트 될 때마다** 호출된다.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```js
+const listener = () => {
+  console.log('상태가 업데이트 됨');
+};
+const unsubscribe = store.subscribe(listener);
+unsubscribe(); // 추후 구독을 비활성화할 때 함수를 호출
+```
 
-## Learn More
+## Redux 3 Rules
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- 단일 스토어 :
+  하나의 애플리케이션 안에는 하나의 스토어가 있다.
+- 읽기 전용 상태 :
+  redux는 읽기 전용이다. 상태를 업데이트 할 때 기존의 객체는 건드리지 않고 새로운 객체를 생성해 주어야 한다.
+  redux에서 불변성을 유지해야 하는 이유는 내부적으로 데이터가 변경되는 것을 감지하기 위해 얕은 비교(shallow equality) 검사를 하기 때문이다.
+- Reducer는 순수한 함수 :
+  변화를 일으키는 리듀서는 순수한 함수여야 한다. 순수한 함수는 다음 조건을 만족한다.
+  - 리듀서 함수는 이전 상태와 액션 객체를 파라미터로 받는다.
+  - 파라미터 외의 값에는 의존하면 안 된다.
+  - 이전 상태는 절대로 건드리지 않고, 변화를 줄 새로운 상태 객체를 만들어서 반환한다.
+  - 똑같은 파라미터로 호출된 리듀서 함수는 언제나 똑같은 결과 값을 반환해야 한다.
