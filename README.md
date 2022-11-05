@@ -185,6 +185,44 @@ store.getState();
 
 useStore은 정말 어쩌다 스토어에 직접 접근해야 하는 상황에만 사용한다.
 
+## useActions
+
+useActions는 공식 내장 함수가 아닌 유틸 Hook을 작성하여 만든다.
+
+```js
+import { bindActionCreators } from 'redux';
+import { useDispatch } from 'react-redux';
+import { useMemo } from 'react';
+
+export default function useActions(actions, deps) {
+  const dispatch = useDispatch();
+  return useMemo(
+    () => {
+      if (Array.isArray(actions)) {
+        return actions.map((a) => bindActionCreators(a, dispatch));
+      }
+      return bindActionCreators(actions, dispatch);
+    },
+    deps ? [dispatch, ...deps] : deps,
+  );
+}
+```
+
+해당 Hook을 사용하면, 여러 개의 액션을 사용해야 하는 경우 코드를 훨씬 깔끔하게 정리하여 사용할 수 있다.
+useActions Hook은 액션 생성 함수를 디스패치하는 함수로 변환해 준다. 액션 생성 함수를 사용하여 액션 객체를 만들고, 이를 스토어에 디스패치하는 작업을 해 주는 함수를 자동으로 만들어 주는 것이다.
+
+useActions는 두 가지 파라미터가 필요하다. 하나는 액션 생성 함수로 이루어진 배열이다, 또 하나는 deps 배열이며, 이 배열 안에 들어 있는 원소가 바뀌면 액션을 디스패치하는 함수를 새로 만들게 된다.
+
+## connect 함수와 Hook의 차이
+
+컨테이너 컴포넌트 작성 시 connect 를 사용할지, useSelector와 useDispatch 를 사용할지는 자유이다. 단, Hooks를 사용하여 컨테이너 컴포넌트를 만들 때 잘 알아 두어야 할 차이점이 있다. connect 함수를 사용하여 컨테이너 컴포넌트를 만들 경우 **해당 컨테이너 컴포넌트의 부모 컴포넌트가 리렌더링 될 때 해당 컨테이너 컴포넌트의 props가 바뀌지 않았다면 리렌더링이 자동으로 방지되어 성능이 최적화 된다.**
+
+반면 useSelector를 사용하여 리덕스 상태를 조회했을 때는 이 최적화 작업이 자동으로 이루어지지 않으므로, 성능 최적화를 위해서는 React.memo를 컨테이너 컴포넌트에 사용해주어야 한다.
+
+```js
+export default React.memo(TodosContainer);
+```
+
 # Redux-actions
 
 redux actions를 사용하면 액션 생성 함수를 더 짧은 코드로 작성할 수 있다. 리듀서를 작성할 때도 switch/case 문이 아닌 handleActions라는 함수를 사용하여 각 액션마다 업데이트 함수를 설정하는 형식으로 작성해 줄 수 있다.
