@@ -92,6 +92,97 @@ unsubscribe(); // 추후 구독을 비활성화할 때 함수를 호출
   - 이전 상태는 절대로 건드리지 않고, 변화를 줄 새로운 상태 객체를 만들어서 반환한다.
   - 똑같은 파라미터로 호출된 리듀서 함수는 언제나 똑같은 결과 값을 반환해야 한다.
 
+## React-redux
+
+컴포넌트를 redux와 연결하려면 react-redux에서 제공하는 connect 함수를 사용한다.
+`connect(mapStateToProps, mapDispatchToProps)(연동할 컴포넌트)`
+여기서 mapStateToProps 는 리덕스 스토어 안의 상태를 컴포넌트의 props로 넘겨주기 위해 설정하는 함수이고,
+mapDispatchToProps 는 액션 생성 함수를 컴포넌트의 props로 넘겨주기 위해 사용하는 함수이다.
+
+```js
+const mapStateToProps = (state) => ({
+  number: state.counter.number,
+});
+const mapDispatchToProps = (dispatch) => ({
+  increase: () => {
+    dispatch(increase());
+  },
+  decrease: () => {
+    dispatch(decrease());
+  },
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(CounterContainer);
+```
+
+익명함수로 단축
+
+```js
+export default connect(
+  (state) => ({
+    number: state.counter.number,
+  }),
+  (dispatch) => ({
+    increase: () => {
+      dispatch(increase());
+    },
+    decrease: () => {
+      dispatch(decrease());
+    },
+  }),
+)(CounterContainer);
+```
+
+redux의 bindActionCreators를 사용했을 때
+
+```js
+export default connect(
+  (state) => ({
+    number: state.counter.number,
+  }),
+  (dispatch) =>
+    bindActionCreators(
+      {
+        increase,
+        decrease,
+      },
+      dispatch,
+    ),
+)(CounterContainer);
+```
+
+## useSelector
+
+redux 스토어와 연동된 컨테이너 컴포넌트를 만들 때, connect 함수를 사용하는 대신 react-redux에서 제공하는 Hooks를 사용할 수도 있다.
+
+`const 결과 = useSelector(상태 선택 함수)`
+여기서 상태 선택 함수는 mapStateToProps 와 형태가 똑같다.
+
+```js
+const number = useSelector((state) => state.counter.number);
+```
+
+## useDispatch
+
+이 Hook은 컴포넌트 내부에서 스토어의 내장 함수 dispatch를 사용할 수 있게 해 준다. 컨테이너 컴포넌트에서 액션을 디스패치해야 한다면 이 Hook을 사용하면 된다.
+
+```js
+const dispatch = useDispatch();
+dispatch({ type: 'SAMPLE_ACTION' });
+```
+
+useDispatch를 사용할 때는 useCallback 과 함께 사용하는 것을 습관화 하자.
+
+## useStore
+
+이 Hook을 사용하면 컴포넌트 내부에서 리덕스 스토어 객체를 직접 사용할 수 있다.
+
+```js
+const store = useStore();
+store.dispatch({ type: 'SAMPLE_ACTION' });
+store.getState();
+```
+
 # Redux-actions
 
 redux actions를 사용하면 액션 생성 함수를 더 짧은 코드로 작성할 수 있다. 리듀서를 작성할 때도 switch/case 문이 아닌 handleActions라는 함수를 사용하여 각 액션마다 업데이트 함수를 설정하는 형식으로 작성해 줄 수 있다.
