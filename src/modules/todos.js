@@ -6,7 +6,6 @@ const REMOVE = 'todos/REMOVE';
 
 export const changeInput = (input) => ({ type: CHANGE_INPUT, input });
 // 액션 생성 함수 -> 커스텀 값 input
-
 let id = 3;
 export const insert = (text) => ({
   type: INSERT,
@@ -16,7 +15,6 @@ export const insert = (text) => ({
     done: false,
   },
 });
-
 export const toggle = (id) => ({
   type: TOGGLE,
   id,
@@ -57,7 +55,7 @@ function todo(state = initialState, action) {
     case REMOVE:
       return {
         ...state,
-        todos: state.todos.filter((todo) => todo.id !== action.todo),
+        todos: state.todos.filter((todo) => todo.id !== action.id),
       };
     default:
       return state;
