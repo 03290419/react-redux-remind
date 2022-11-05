@@ -105,6 +105,25 @@ export const decrease = () => createAction(DECREASE); // 액션 생성 함수
 ```
 
 createAction 을 사용하면 매번 객체를 직접 만들어 줄 필요 없이 더욱 간단하게 액션 생성 함수를 선언할 수 있다.
+createAction 을 사용하면 커스텀해서 주어주던, 액션에 필요한 추가 데이터는 payload라는 이름을 사용한다.
+
+```js
+const MY_ACTION = 'sample/MY_ACTION';
+const myAction = createAction(MY_ACTION);
+const action = myAction('hello world');
+
+//결과: {type: MY_ACTION, payload: 'hello world'}
+```
+
+액션 생성함수에서 받아 온 파라미터를 그대로 payload에 넣는 것이 아니라 변형을 주어서 넣고 싶다면, createAction의 두 번째 함수에 payload 를 정의하는 함수를 따로 선언해서 넣어주면 된다.
+
+```js
+const MY_ACTION = 'sample/MY_ACTION';
+const myAction = createAction(MY_ACTION, (text) => `${text}!`);
+const action = myAction('hello world');
+
+//결과: {type: MY_ACTION, payload: 'hello world!'}
+```
 
 - handleActions
 
